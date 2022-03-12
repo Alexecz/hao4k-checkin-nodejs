@@ -3,9 +3,6 @@ import xmlJs from "xml-js";
 import iconv from "iconv-lite";
 import * as cheerio from 'cheerio';
 
-// server酱开关，填off不开启(默认)，填on同时开启cookie失效通知和签到成功通知
-const server = process.env["SERVER"];
-
 // 填写server酱sckey,不开启server酱则不用填
 const sckey = process.env["SCKEY"];
 
@@ -84,12 +81,15 @@ function checkin(formHash) {
       pushNotice(message)
     })
     .catch((error) => {
-      console.log("hao4K:签到出错" + error);
+      console.log("hao4K:签到出错或超时" + error);
+      message = "hao4K:签到出错或超时" + error;
+      message = encodeURI(message);
+      pushNotice(message);
     });
 }
 
 function pushNotice(message) {
-  if (server === "on") {
+  if (sckey) {
     axios
       .get("https://sc.ftqq.com/" + sckey + ".send?text=" + message)
       // 解决 UnhandledPromiseRejectionWarning
