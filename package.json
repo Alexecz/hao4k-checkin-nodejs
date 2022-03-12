@@ -1,0 +1,28 @@
+{
+  "name": "hao4k-checkin-nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alexecz/hao4k-checkin-nodejs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alexecz/hao4k-checkin-nodejs/issues"
+  },
+  "homepage": "https://github.com/Alexecz/hao4k-checkin-nodejs#readme",
+  "dependencies": {
+    "axios": "^0.26.0",
+    "cheerio": "^1.0.0-rc.10",
+    "iconv-lite": "^0.6.3",
+    "xml-js": "^1.6.11"
+  }
+}
