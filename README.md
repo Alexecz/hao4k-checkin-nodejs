@@ -1,6 +1,7 @@
 改进原作者的签到 
- ·增加动态获取formhash （每个人的formhash不同）
- ·优化判断cookie是否生效
+·增加动态获取formhash （每个人的formhash不同）
+·优化判断cookie是否生效
+
 原作者地址：https://github.com/ming917/hao4K-checkin
 
 
