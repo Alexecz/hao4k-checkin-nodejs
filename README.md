@@ -34,7 +34,7 @@ hao4K自动签到来啦！！！
 
 3. 登录hao4K后获取cookies。（简单获取方法：浏览器快捷键F12，打开调试窗口，点击“network”随便一个接口的请求头中获取）。cookie示例需要的关键信息：HxHg_2132_saltkey=xxx;HxHg_2132_auth=xxx;
 
-4. 在自己的仓库“Settings”里创建3个“Secrets => Actions => New repository secret”，分别是：（不开启通知，只需要创建一个COOKIE即可）
+4. 在自己的仓库“Settings”里创建2个“Secrets => Actions => New repository secret”，分别是：（不开启通知，只需要创建一个COOKIE即可）
 
    - COOKIE（**必填**）
    - SCKEY（填写server酱sckey，不开启server酱则不用填）
