@@ -1,3 +1,6 @@
+# hao4k-checkin-nodejs
+![签到](https://github.com/Alexecz/hao4k-checkin-nodejs/actions/workflows/checkin.yml/badge.svg)
+
 ### 改进原作者的签到 
 1、增加动态获取formhash （每个人的formhash不同）
 
