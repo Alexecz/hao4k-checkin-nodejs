@@ -6,7 +6,15 @@ import * as cheerio from 'cheerio';
 // 填写server酱sckey,不开启server酱则不用填
 const sckey = process.env["SCKEY"];
 
-// 填入glados账号对应cookie
+
+// 填写pushplus的token,不开启pushplus则不用填
+const token = process.env["PPTOKEN"];
+
+// 填写PushDeer的key, 不开启不用填
+const pushDeer = process.env["PDKEY"]
+
+
+// 填入Hao4k账号对应cookie
 const cookie = process.env["COOKIE"];
 
 const loginUrl =
@@ -36,7 +44,7 @@ function getFormHash() {
       if (userName == '') {
         console.log("cookie失效！");
         let message = "cookie失效！";
-        pushNotice(message);
+        pushNotice(message,message);
       } else {
         console.log("获取用户信息成功！")
         formHash = $('#scbar_form input').eq(1).val();
@@ -50,7 +58,7 @@ function getFormHash() {
 
 function checkin(formHash) {
   const checkInUrl =
-    "https://www.hao4k.cn//qiandao/?mod=sign&operation=qiandao&formhash="+ formHash +"&format=empty&inajax=1&ajaxtarget=";
+    "https://www.hao4k.cn//qiandao/?mod=sign&operation=qiandao&formhash=" + formHash + "&format=empty&inajax=1&ajaxtarget=";
   axios
     .get(checkInUrl, {
       headers,
@@ -63,36 +71,84 @@ function checkin(formHash) {
         spaces: 4,
       });
       const data = JSON.parse(dataStr);
-      console.log(data);
       const content = data?.root?._cdata;
       let message = "";
       if (content) {
         if (content === "今日已签") {
-          message = "hao4K:今日已签";
-          console.log(message);
+          message = "hao4K:今日已签！";
+          getCheckinInfo(message)
         }
       } else {
         message = "hao4K:签到成功!";
-        console.log(message);
+        getCheckinInfo(message)
       }
 
       // 解决 Request path contains unescaped characters
-      message = encodeURI(message);
-      pushNotice(message)
+      // message = encodeURI(message);
+      // pushNotice(message)
     })
     .catch((error) => {
       console.log("hao4K:签到出错或超时" + error);
       message = "hao4K:签到出错或超时" + error;
-      message = encodeURI(message);
-      pushNotice(message);
+      pushNotice(message, message);
     });
 }
 
-function pushNotice(message) {
+function getCheckinInfo(status) {
+  axios
+    .get(loginUrl, {
+      headers,
+      responseType: "arraybuffer",
+    })
+    .then((response) => {
+      const gb = iconv.decode(response.data, "gb2312");
+      const $ = cheerio.load(gb);
+      // console.log($.html())
+      let days = $('#lxdays').val(); //连续签到天数
+      let reward = $('#lxreward').val(); // 签到奖励
+      let allDays = $('#lxtdays').val(); // 签到总天数
+      let rank = $('#qiandaobtnnum').val();// 签到排名
+      let info = " 本次签到K币奖励： " + reward + " 个； 已连续签到： " + days + " 天; 今日排名： " + rank + " 位； 签到总天数： " + allDays + " 天；";
+      let message = status + info;
+      console.log(message)
+      pushNotice(status, info);
+    })
+    .catch((error) => {
+      console.log("hao4K:获取签到信息出错！" + error);
+    });
+}
+
+function pushNotice(status, info) {
   if (sckey) {
+    let message = encodeURI(status);
+    // info = encodeURI(info);
     axios
       .get("https://sc.ftqq.com/" + sckey + ".send?text=" + message)
-      // 解决 UnhandledPromiseRejectionWarning
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+
+  if (token) {
+    axios
+      .post("http://www.pushplus.plus/send", {
+        'token': token,
+        'title': status,
+        'content': info
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+
+  if (pushDeer) {
+    let message = status + info;
+    axios
+      .post("https://api2.pushdeer.com/message/push", {
+        'pushkey': pushDeer,
+        'type': 'text',
+        'text': message
+      })
       .catch((e) => {
         console.log(e);
       });

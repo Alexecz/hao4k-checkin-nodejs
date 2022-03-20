@@ -2,9 +2,13 @@
 ![签到](https://github.com/Alexecz/hao4k-checkin-nodejs/actions/workflows/checkin.yml/badge.svg)
 
 ### 改进原作者的签到 
-1、增加动态获取formhash （每个人的formhash不同）
+1、修复签到失败。
 
 2、优化判断cookie是否生效
+
+3、新增签到结果的提示和推送。
+
+4、新增2个推送平台。
 
 原作者地址：https://github.com/ming917/hao4K-checkin
 
@@ -12,9 +16,6 @@
 ### 建议 cookie 用该浏览器插件直接复制   直接点copy all
 https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmiomfpdnehakfmpfl/related?hl=zh-CN
 
-### 高能预警~
-
-hao4K自动签到来啦！！！
 
 #### 脚本功能：
 
@@ -22,8 +23,11 @@ hao4K自动签到来啦！！！
 
 2、通过cookies自动登录（[https://www.hao4k.cn/](https://www.hao4k.cn/))，脚本会自动进行checkin。
 
-3、然后通过“Server酱”（[http://sc.ftqq.com/3.version](http://sc.ftqq.com/3.version))，自动发通知到微信上。
+3、可以通过“推送加” （[http://www.pushplus.plus](http://www.pushplus.plus))，自动发通知到微信上。
 
+4、可以通过“PushDeer” （[http://www.pushdeer.com](http://www.pushdeer.com))，自动推送到**手机通知**上。 请使用**官方在线版**。 （推荐**IOS**使用！**无需下载APP**）
+
+5、可以通过“Server酱”（[http://sc.ftqq.com/3.version](http://sc.ftqq.com/3.version))，自动发通知到微信上。(不建议使用Server酱)
 
 
 #### 食用姿势：
@@ -32,14 +36,16 @@ hao4K自动签到来啦！！！
 
 2. 注册hao4K
 
-3. 登录hao4K后获取cookies。（简单获取方法：浏览器快捷键F12，打开调试窗口，点击“network”随便一个接口的请求头中获取）。cookie示例需要的关键信息：HxHg_2132_saltkey=xxx;HxHg_2132_auth=xxx;
+3. 登录hao4K后获取cookies。（简单获取方法：浏览器快捷键F12，打开调试窗口，点击“network”随便一个接口的请求头中获取）。cookie示例需要的关键信息：HxHg_2132_saltkey=xxx;HxHg_2132_auth=xxx; 也可用浏览器插件直接获取。
 
-4. 在自己的仓库“Settings”里创建2个“Secrets => Actions => New repository secret”，分别是：（不开启通知，只需要创建一个COOKIE即可）
+4. 在自己的仓库“Settings”里根据需要创建“Secrets => Actions => New repository secret”，分别是：（不开启通知，只需要创建一个COOKIE即可）
 
-   - COOKIE（**必填**）
-   - SCKEY（填写server酱sckey，不开启server酱则不用填）
+   - COOKIE （**必填**）
+   - PPTOKEN （填写推送加的token, 不开启不用填）
+   - PDKEY （填写PushDeer的key, 不开启不用填）
+   - SCKEY （填写server酱sckey，不开启server酱则不用填）
 
-5. 以上设置完毕后，每天零点会自动触发，并会执行自动checkin，如果开启server酱，会自动发通知到微信上。
+5. 以上设置完毕后，每天零点会自动触发，并会执行自动checkin。
 
 6. **如果以上都不会的话，注册hao4K后，每天勤奋点记得登录后手动进行checkin即可。**
 
