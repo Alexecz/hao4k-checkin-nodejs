@@ -135,10 +135,10 @@ function pushNotice(status, info) {
     if (pushDeer) {
         sendPushDeerMsg(status, info);
     }
-    console.log("配置的barkKey：",barkKey)
     if (barkKey) {
         sendBarkMsg(status, info);
     }
+    console.log("结束推送消息")
 }
 
 function sendSCMsg(status, info) {
@@ -182,7 +182,6 @@ function sendBarkMsg(status, info) {
     let message = encodeURI(info);
     let barkRealServer = barkServer ? barkServer : "https://api.day.app";
     let barkUrl = barkRealServer + "/" + barkKey + "/" + title + "/" + message;
-    console.log(barkUrl);
     axios
         .get(barkUrl)
         .catch((e) => {
