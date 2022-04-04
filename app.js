@@ -125,6 +125,7 @@ function getCheckinInfo(status) {
 }
 
 function pushNotice(status, info) {
+    console.log("开始推送消息")
     if (sckey) {
         sendSCMsg(status, info);
     }
@@ -134,6 +135,7 @@ function pushNotice(status, info) {
     if (pushDeer) {
         sendPushDeerMsg(status, info);
     }
+    console.log("配置的barkKey：",barkKey)
     if (barkKey) {
         sendBarkMsg(status, info);
     }
