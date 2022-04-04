@@ -180,6 +180,7 @@ function sendBarkMsg(status, info) {
     let message = encodeURI(info);
     let barkRealServer = barkServer ? barkServer : "https://api.day.app";
     let barkUrl = barkRealServer + "/" + barkKey + "/" + title + "/" + message;
+    console.log(barkUrl);
     axios
         .get(barkUrl)
         .catch((e) => {
