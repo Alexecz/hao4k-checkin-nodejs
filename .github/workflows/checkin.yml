@@ -39,6 +39,8 @@ jobs:
         COOKIE: ${{ secrets.COOKIE }}
         PPTOKEN : ${{ secrets.PPTOKEN }}
         PDKEY : ${{ secrets.PDKEY  }}
+        BARKKEY : ${{ secrets.BARKKEY  }}
+        BARKSERVER : ${{ secrets.BARKSERVER  }}
 
 
 
