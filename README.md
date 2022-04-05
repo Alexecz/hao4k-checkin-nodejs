@@ -29,6 +29,8 @@ https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmi
 
 5、可以通过“Server酱”（[http://sc.ftqq.com/3.version](http://sc.ftqq.com/3.version))，自动发通知到微信上。(不建议使用Server酱)
 
+6、可以通过“bark”（[https://github.com/Finb/Bark](https://github.com/Finb/Bark))，自动发通知到ios上。
+
 
 #### 食用姿势：
 
@@ -44,6 +46,8 @@ https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmi
    - PPTOKEN （填写推送加的token, 不开启不用填）
    - PDKEY （填写PushDeer的key, 不开启不用填）
    - SCKEY （填写server酱sckey，不开启server酱则不用填）
+   - BARKKEY (填写bark的key，不开启bark推送则不用填，默认使用官方服务器发送，如需自定义请通过BARKSERVER配置)
+   - BARKSERVER (填写bark的服务器地址，不开启bark推送则不用填)
 
 5. 以上设置完毕后，每天零点会自动触发，并会执行自动checkin。
 
