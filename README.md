@@ -10,6 +10,8 @@
 
 4、新增2个推送平台。
 
+5、增加4k视界打卡支持，通过CHECKHOST配置
+
 原作者地址：https://github.com/ming917/hao4K-checkin
 
 
@@ -31,6 +33,8 @@ https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmi
 
 6、可以通过“bark”（[https://github.com/Finb/Bark](https://github.com/Finb/Bark))，自动发通知到ios上。
 
+7、通过Secrets配置需要进行打卡的服务信息，支持hao4k和4k视界，如果需要同时打卡使用逗号分隔
+
 
 #### 食用姿势：
 
@@ -48,6 +52,7 @@ https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmi
    - SCKEY （填写server酱sckey，不开启server酱则不用填）
    - BARKKEY (填写bark的key，不开启bark推送则不用填，默认使用官方服务器发送，如需自定义请通过BARKSERVER配置)
    - BARKSERVER (填写bark的服务器地址，不开启bark推送则不用填)
+   - CHECKHOST (填写需要进行打卡的服务，hao4k,4ksj，未配置默认只打卡hao4k)
 
 5. 以上设置完毕后，每天零点会自动触发，并会执行自动checkin。
 

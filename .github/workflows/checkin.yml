@@ -41,6 +41,7 @@ jobs:
         PDKEY : ${{ secrets.PDKEY  }}
         BARKKEY : ${{ secrets.BARKKEY  }}
         BARKSERVER : ${{ secrets.BARKSERVER  }}
+        CHECKHOST : ${{ secrets.CHECKHOST  }}
 
 
 

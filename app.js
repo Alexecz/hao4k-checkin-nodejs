@@ -20,10 +20,15 @@ const barkKey = process.env["BARKKEY"]
 // 填写Bark的服务器地址, 不开启不用填
 const barkServer = process.env["BARKSERVER"]
 
+//配置需要打开的服务信息,hao4k 和 4ksj，未配置只对hao4k
+const needCheckHost = process.env["CHECKHOST"]
+
 // 填入Hao4k账号对应cookie
 const cookie = process.env["COOKIE"];
 
-const loginUrl =
+const sjUrl =
+    "https://www.4ksj.com/qiandao/";
+const hao4kUrl =
     "https://www.hao4k.cn/qiandao/";
 
 const userAgent =
@@ -35,43 +40,57 @@ const headers = {
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
 };
 
-function getFormHash() {
-    axios
-        .get(loginUrl, {
+class HostInfo {
+    name;
+    url;
+    status;
+    formHash;
+    message;
+
+    constructor(name, url) {
+        this.name = name;
+        this.url = url;
+    }
+}
+
+async function getFormHash(host) {
+    await axios
+        .get(host.url, {
             headers,
             responseType: "arraybuffer",
         })
-        .then((response) => {
+        .then(async (response) => {
             const gb = iconv.decode(response.data, "gb2312");
             const $ = cheerio.load(gb);
             let formHash = '';
-            // console.log($.html())
             const userName = $('#mumucms_username').text();
             if (userName === '') {
                 console.log("cookie失效！");
-                let message = "cookie失效！";
-                pushNotice(message, message);
+                host.status = false;
+                host.message = "cookie失效！";
             } else {
-                console.log("获取用户信息成功！")
+                console.log(host.name, "获取用户信息成功！")
                 formHash = $('#scbar_form input').eq(1).val();
-                checkin(formHash);
+                host.formHash = formHash;
+                await checkin(host);
             }
         })
         .catch((error) => {
-            console.log("hao4K:获取formhash出错" + error);
+            host.status = false;
+            host.message = "获取formhash出错" + error;
+            console.log(host.name, error);
         });
 }
 
-function checkin(formHash) {
+async function checkin( host) {
     const checkInUrl =
-        "https://www.hao4k.cn//qiandao/?mod=sign&operation=qiandao&formhash=" + formHash + "&format=empty&inajax=1&ajaxtarget=";
-    let message = "";
-    axios
+        host.url + "?mod=sign&operation=qiandao&formhash=" + host.formHash + "&format=empty&inajax=1&ajaxtarget=";
+    await axios
         .get(checkInUrl, {
             headers,
             responseType: "arraybuffer",
         })
-        .then((response) => {
+        .then(async (response) => {
             const resUtf8 = iconv.decode(response.data, "GBK");
             const dataStr = xmlJs.xml2json(resUtf8, {
                 compact: true,
@@ -81,29 +100,25 @@ function checkin(formHash) {
             const content = data?.root?._cdata;
 
             if (content) {
+                host.status = true;
                 if (content === "今日已签") {
-                    message = "hao4K:今日已签！";
-                    getCheckinInfo(message)
+                    host.message = "今日已签！";
                 }
             } else {
-                message = "hao4K:签到成功!";
-                getCheckinInfo(message)
+                host.message = "签到成功!";
             }
-
-            // 解决 Request path contains unescaped characters
-            // message = encodeURI(message);
-            // pushNotice(message)
+            await getCheckinInfo(host);
         })
         .catch((error) => {
-            console.log("hao4K:签到出错或超时" + error);
-            message = "hao4K:签到出错或超时" + error;
-            pushNotice(message, message);
+            console.log(host.name,"签到出错或超时" + error);
+            host.status = false;
+            host.message = "签到出错或超时" + error;
         });
 }
 
-function getCheckinInfo(status) {
-    axios
-        .get(loginUrl, {
+async function getCheckinInfo(host) {
+    await axios
+        .get(host.url, {
             headers,
             responseType: "arraybuffer",
         })
@@ -115,28 +130,32 @@ function getCheckinInfo(status) {
             let allDays = $('#lxtdays').val(); // 签到总天数
             let rank = $('#qiandaobtnnum').val();// 签到排名
             let info = " 本次签到K币奖励： " + reward + " 个； 已连续签到： " + days + " 天; 今日排名： " + rank + " 位； 签到总天数： " + allDays + " 天；";
-            let message = status + info;
-            console.log(message)
-            pushNotice(status, info);
+            host.message = info;
+            console.log(host.name,info)
         })
         .catch((error) => {
-            console.log("hao4K:获取签到信息出错！" + error);
+            host.message = "获取签到信息出错！" + error;
+            console.log(host.name, "获取签到信息出错！" + error);
         });
 }
 
-function pushNotice(status, info) {
+function pushNotice(status, message) {
     console.log("开始推送消息")
     if (sckey) {
-        sendSCMsg(status, info);
+        console.log("通过server酱推送消息");
+        sendSCMsg(status, message);
     }
     if (token) {
-        sendPushPlusMsg(status, info);
+        console.log("通过pushPlus推送消息");
+        sendPushPlusMsg(status, message);
     }
     if (pushDeer) {
-        sendPushDeerMsg(status, info);
+        console.log("通过pushDeer推送消息");
+        sendPushDeerMsg(status, message);
     }
     if (barkKey) {
-        sendBarkMsg(status, info);
+        console.log("通过bark推送消息");
+        sendBarkMsg(status, message);
     }
     console.log("结束推送消息")
 }
@@ -189,4 +208,46 @@ function sendBarkMsg(status, info) {
         })
 }
 
-getFormHash();
+async function start() {
+    let status = "未配置";
+    let message = "未配置";
+    let checkIn = false;
+    console.log("配置的打卡的服务", needCheckHost);
+    const needCheck = needCheckHost ? needCheckHost: "hao4k";
+    if (needCheck.indexOf("4ksj") > -1) {
+        if (!checkIn) {
+            checkIn = true;
+            status = "";
+            message = "";
+        }
+        let sj = new HostInfo("4K视界", sjUrl);
+        await getFormHash(sj);
+        status += sj.name + ": ";
+        if (sj.status) {
+            status += "签到成功！";
+        } else {
+            status += "签到失败！";
+        }
+        message += "* " + sj.name + ": " + sj.message;
+    }
+    if (needCheck.indexOf("hao4k") > -1) {
+        if (!checkIn) {
+            checkIn = true;
+            status = "";
+            message = "";
+        }
+        let hao4k = new HostInfo("hao4K", hao4kUrl);
+        await getFormHash(hao4k);
+        status += hao4k.name + ": ";
+        if (hao4k.status) {
+            status += "签到成功！";
+        } else {
+            status += "签到失败！";
+        }
+        message += "* " + hao4k.name + ": " + hao4k.message;
+    }
+    console.log(status, message);
+    pushNotice(status, message);
+}
+
+await start()
