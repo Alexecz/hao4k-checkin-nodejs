@@ -100,13 +100,13 @@ async function checkin( host) {
             const content = data?.root?._cdata;
 
             if (content) {
-                host.status = true;
                 if (content === "今日已签") {
                     host.message = "今日已签！";
                 }
             } else {
                 host.message = "签到成功!";
             }
+            host.status = true;
             await getCheckinInfo(host);
         })
         .catch((error) => {
