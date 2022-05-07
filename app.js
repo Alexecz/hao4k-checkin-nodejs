@@ -129,8 +129,8 @@ async function getCheckinInfo(host) {
             let reward = $('#lxreward').val(); // 签到奖励
             let allDays = $('#lxtdays').val(); // 签到总天数
             let rank = $('#qiandaobtnnum').val();// 签到排名
-            let info = " 本次签到K币奖励： " + reward + " 个； 已连续签到： " + days + " 天; 今日排名： " + rank + " 位； 签到总天数： " + allDays + " 天；";
-            host.message = info;
+            let info = " 本次签到奖励： " + reward + " 个币； 已连续签到： " + days + " 天; 今日排名： " + rank + " 位； 签到总天数： " + allDays + " 天；";
+            host.message = host.message + info;
             console.log(host.name,info)
         })
         .catch((error) => {
