@@ -69,8 +69,9 @@ async function getFormHash(host) {
                 host.status = false;
                 host.message = "cookie失效！";
             } else {
-                console.log(host.name, "获取用户信息成功！")
+                console.log(host.name, "获取用户信息成功！");
                 formHash = $('#scbar_form input').eq(1).val();
+                host.status = true;
                 host.formHash = formHash;
                 await checkin(host);
             }
