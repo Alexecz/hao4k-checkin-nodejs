@@ -12,10 +12,11 @@
 
 5、增加4k视界打卡支持，通过CHECKHOST配置
 
+
 原作者地址：https://github.com/ming917/hao4K-checkin
 
 
-### 建议 cookie 用该浏览器插件直接复制   直接点copy all
+### 建议提取 cookie 用该浏览器插件复制  把cookie列表勾上 然后点cookie列表 直接点copy all  （自己复制cookie会有问题！）
 https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmiomfpdnehakfmpfl/related?hl=zh-CN
 
 

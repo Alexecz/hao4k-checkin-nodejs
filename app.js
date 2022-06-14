@@ -4,9 +4,12 @@ import xmlJs from "xml-js";
 import iconv from "iconv-lite";
 import * as cheerio from 'cheerio';
 
+axios.defaults.timeout = 10000;//设置超时时间，单位毫秒
+axios.defaults.retry = 3; //设置全局请求次数
+axios.defaults.retryDelay = 1000;//设置全局请求间隙
+
 // 填写server酱sckey,不开启server酱则不用填
 const sckey = process.env["SCKEY"];
-
 
 // 填写pushplus的token,不开启pushplus则不用填
 const token = process.env["PPTOKEN"];
@@ -83,7 +86,7 @@ async function getFormHash(host) {
         });
 }
 
-async function checkin( host) {
+async function checkin(host) {
     const checkInUrl =
         host.url + "?mod=sign&operation=qiandao&formhash=" + host.formHash + "&format=empty&inajax=1&ajaxtarget=";
     await axios
@@ -111,7 +114,7 @@ async function checkin( host) {
             await getCheckinInfo(host);
         })
         .catch((error) => {
-            console.log(host.name,"签到出错或超时" + error);
+            console.log(host.name, "签到出错或超时" + error);
             host.status = false;
             host.message = "签到出错或超时" + error;
         });
@@ -132,7 +135,7 @@ async function getCheckinInfo(host) {
             let rank = $('#qiandaobtnnum').val();// 签到排名
             let info = " 本次签到奖励： " + reward + " 个币； 已连续签到： " + days + " 天; 今日排名： " + rank + " 位； 签到总天数： " + allDays + " 天；";
             host.message = host.message + info;
-            console.log(host.name,info)
+            console.log(host.name, info)
         })
         .catch((error) => {
             host.message = "获取签到信息出错！" + error;
@@ -214,7 +217,7 @@ async function start() {
     let message = "未配置";
     let checkIn = false;
     console.log("配置的打卡的服务", needCheckHost);
-    const needCheck = needCheckHost ? needCheckHost: "hao4k";
+    const needCheck = needCheckHost ? needCheckHost : "hao4k";
     if (needCheck.indexOf("4ksj") > -1) {
         if (!checkIn) {
             checkIn = true;
