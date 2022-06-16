@@ -12,6 +12,8 @@
 
 5、增加4k视界打卡支持，通过CHECKHOST配置
 
+6、增加独立设置Hao4K和4K视界的cookie。
+
 
 原作者地址：https://github.com/ming917/hao4K-checkin
 
@@ -47,7 +49,8 @@ https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmi
 
 4. 在自己的仓库“Settings”里根据需要创建“Secrets => Actions => New repository secret”，分别是：（不开启通知，只需要创建一个COOKIE即可）
 
-   - COOKIE （**必填**； 不管哪种打卡方式**只需要填写Hao4K的cookie**）
+   - COOKIE （**必填**； **填写Hao4K的cookie**）
+   - 4KSJCOOKIE （**选填**； **填写4K视界的cookie**；不设置会尝试用Hao4K的cookie签到）
    - PPTOKEN （填写推送加的token, 不开启不用填）
    - PDKEY （填写PushDeer的key, 不开启不用填）
    - SCKEY （填写server酱sckey，不开启server酱则不用填）
@@ -55,7 +58,7 @@ https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmi
    - BARKSERVER (填写bark的服务器地址，不开启bark推送则不用填)
    - CHECKHOST (填写需要进行打卡的服务，hao4k,4ksj，未配置默认只打卡hao4k)
 
-5. 以上设置完毕后，每天零点会自动触发，并会执行自动checkin。
+5. 以上设置完毕后，每天零点会自动触发，并会执行自动签到（0点有失败率，后期可能会改为1点）。
 
-6. **如果以上都不会的话，注册hao4K后，每天勤奋点记得登录后手动进行checkin即可。**
+6. **如果以上都不会的话，注册hao4K后，每天勤奋点记得登录后手动进行签到即可。**
 

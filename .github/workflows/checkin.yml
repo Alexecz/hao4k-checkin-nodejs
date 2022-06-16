@@ -37,6 +37,7 @@ jobs:
       env: 
         SCKEY: ${{ secrets.SCKEY }}
         COOKIE: ${{ secrets.COOKIE }}
+        4KSJCOOKIE: ${{ secrets.4KSJCOOKIE }}
         PPTOKEN : ${{ secrets.PPTOKEN }}
         PDKEY : ${{ secrets.PDKEY  }}
         BARKKEY : ${{ secrets.BARKKEY  }}
