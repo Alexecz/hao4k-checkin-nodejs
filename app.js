@@ -29,7 +29,7 @@ const needCheckHost = process.env["CHECKHOST"]
 let cookie = process.env["COOKIE"];
 
 // 填入4KSJ账号对应Cookie
-let cookieSJ = process.env["4KSJCOOKIE"];
+let cookieSJ = process.env["SJCOOKIE"];
 
 const sjUrl =
     "https://www.4ksj.com/qiandao/";

@@ -50,7 +50,7 @@ https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmi
 4. 在自己的仓库“Settings”里根据需要创建“Secrets => Actions => New repository secret”，分别是：（不开启通知，只需要创建一个COOKIE即可）
 
    - COOKIE （**必填**； **填写Hao4K的cookie**）
-   - 4KSJCOOKIE （**选填**； **填写4K视界的cookie**；不设置会尝试用Hao4K的cookie签到）
+   - SJCOOKIE （**选填**； **填写4K视界的cookie**；不设置会尝试用Hao4K的cookie签到）
    - PPTOKEN （填写推送加的token, 不开启不用填）
    - PDKEY （填写PushDeer的key, 不开启不用填）
    - SCKEY （填写server酱sckey，不开启server酱则不用填）
