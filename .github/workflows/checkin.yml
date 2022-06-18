@@ -10,10 +10,10 @@ on:
     branches: [ main ]
   # schedule 事件允许您在计划的时间触发工作流程
   schedule:
-    # 设置 UTC 时间每天 16:00 自动触发即中国 0:00，github有误差大概在 0:10 左右触发 
+    # 设置 UTC 时间每天 16:00 自动触发即中国 0:00，github有误差大概在 0:10 左右触发;有需要可以自行更改此文件调整时间
     # POSIX cron 语法，只有五个域：分 时 日 月 周
     # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html#tag_20_25_07
-    - cron:  0 16 * * *  
+    - cron:  0 16,22 * * *  
 
 jobs:
   checkin:
