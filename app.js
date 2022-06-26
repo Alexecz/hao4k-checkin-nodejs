@@ -4,9 +4,11 @@ import xmlJs from "xml-js";
 import iconv from "iconv-lite";
 import * as cheerio from 'cheerio';
 
+axios.defaults.retry = 3; //设置全局请求次数
+axios.defaults.retryDelay = 1000;//设置全局请求间隙
+
 // 填写server酱sckey,不开启server酱则不用填
 const sckey = process.env["SCKEY"];
-
 
 // 填写pushplus的token,不开启pushplus则不用填
 const token = process.env["PPTOKEN"];
@@ -24,7 +26,12 @@ const barkServer = process.env["BARKSERVER"]
 const needCheckHost = process.env["CHECKHOST"]
 
 // 填入Hao4k账号对应cookie
-const cookie = process.env["COOKIE"];
+let cookie = process.env["COOKIE"];
+
+
+// 填入4KSJ账号对应Cookie
+let cookieSJ = process.env["SJCOOKIE"];
+
 
 const sjUrl =
     "https://www.4ksj.com/qiandao/";
@@ -40,20 +47,29 @@ const headers = {
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
 };
 
+const SJheaders = {
+    cookie: cookieSJ ?? cookie,
+    "User-Agent": userAgent,
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+};
+
 class HostInfo {
     name;
     url;
+    header;
     status;
     formHash;
     message;
 
-    constructor(name, url) {
+    constructor(name, url,header) {
         this.name = name;
         this.url = url;
+        this.header = header;
     }
 }
 
 async function getFormHash(host) {
+    let headers= host.header;
     await axios
         .get(host.url, {
             headers,
@@ -83,9 +99,10 @@ async function getFormHash(host) {
         });
 }
 
-async function checkin( host) {
+async function checkin(host) {
     const checkInUrl =
         host.url + "?mod=sign&operation=qiandao&formhash=" + host.formHash + "&format=empty&inajax=1&ajaxtarget=";
+        let headers= host.header;
     await axios
         .get(checkInUrl, {
             headers,
@@ -111,13 +128,14 @@ async function checkin( host) {
             await getCheckinInfo(host);
         })
         .catch((error) => {
-            console.log(host.name,"签到出错或超时" + error);
+            console.log(host.name, "签到出错或超时" + error);
             host.status = false;
             host.message = "签到出错或超时" + error;
         });
 }
 
 async function getCheckinInfo(host) {
+    let headers= host.header;
     await axios
         .get(host.url, {
             headers,
@@ -132,7 +150,7 @@ async function getCheckinInfo(host) {
             let rank = $('#qiandaobtnnum').val();// 签到排名
             let info = " 本次签到奖励： " + reward + " 个币； 已连续签到： " + days + " 天; 今日排名： " + rank + " 位； 签到总天数： " + allDays + " 天；";
             host.message = host.message + info;
-            console.log(host.name,info)
+            console.log(host.name, info)
         })
         .catch((error) => {
             host.message = "获取签到信息出错！" + error;
@@ -214,14 +232,14 @@ async function start() {
     let message = "未配置";
     let checkIn = false;
     console.log("配置的打卡的服务", needCheckHost);
-    const needCheck = needCheckHost ? needCheckHost: "hao4k";
+    const needCheck = needCheckHost ? needCheckHost : "hao4k";
     if (needCheck.indexOf("4ksj") > -1) {
         if (!checkIn) {
             checkIn = true;
             status = "";
             message = "";
         }
-        let sj = new HostInfo("4K视界", sjUrl);
+        let sj = new HostInfo("4K视界", sjUrl,SJheaders);
         await getFormHash(sj);
         status += sj.name + ": ";
         if (sj.status) {
@@ -237,7 +255,7 @@ async function start() {
             status = "";
             message = "";
         }
-        let hao4k = new HostInfo("hao4K", hao4kUrl);
+        let hao4k = new HostInfo("hao4K", hao4kUrl,headers);
         await getFormHash(hao4k);
         status += hao4k.name + ": ";
         if (hao4k.status) {
