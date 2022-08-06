@@ -64,7 +64,7 @@ class HostInfo {
     formHash;
     message;
 
-    constructor(name, url,header) {
+    constructor(name, url, header) {
         this.name = name;
         this.url = url;
         this.header = header;
@@ -72,7 +72,7 @@ class HostInfo {
 }
 
 async function getFormHashSJ(host) {
-    let headers= host.header;
+    let headers = host.header;
     await axios
         .get(host.url + 'plugin.php?id=k_misign:sign', {
             headers,
@@ -82,12 +82,13 @@ async function getFormHashSJ(host) {
             const gb = iconv.decode(response.data, "utf-8");
             const $ = cheerio.load(gb);
             let formHash = '';
-            const userName = $('#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div:nth-child(2)').text().replace('\n','');
+            const userName = $('#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div:nth-child(2)').text().replace('\n', '');
             if (userName === '') {
                 console.log("cookie失效！");
                 host.status = false;
                 host.message = "cookie失效！";
             } else {
+                console.log(host.name, "获取用户信息成功！");
                 const href = $('#plugin > div.comiis_body > div.comiis_sidenv_box > div.comiis_sidenv_top.f_f > div.sidenv_exit > a:nth-child(1)').attr('href');
                 if (href.indexOf('formhash=') !== -1) {
                     let formHashStr = href.split('formhash=')[1];
@@ -106,7 +107,7 @@ async function getFormHashSJ(host) {
 }
 
 async function getFormHash(host) {
-    let headers= host.header;
+    let headers = host.header;
     await axios
         .get(host.url, {
             headers,
@@ -139,7 +140,7 @@ async function getFormHash(host) {
 async function checkinSJ(host) {
     const checkInUrl =
         host.url + "qiandao/?mod=sign&operation=qiandao&format=text&formhash=" + host.formHash;
-        let headers= host.header;
+    let headers = host.header;
     await axios
         .get(checkInUrl, {
             headers,
@@ -174,7 +175,7 @@ async function checkinSJ(host) {
 async function checkin(host) {
     const checkInUrl =
         host.url + "?mod=sign&operation=qiandao&formhash=" + host.formHash + "&format=empty&inajax=1&ajaxtarget=";
-    let headers= host.header;
+    let headers = host.header;
     await axios
         .get(checkInUrl, {
             headers,
@@ -207,7 +208,7 @@ async function checkin(host) {
 }
 
 async function getCheckinInfoSJ(host) {
-    let headers= host.header;
+    let headers = host.header;
     await axios
         .get(host.url + 'plugin.php?id=k_misign:sign', {
             headers,
@@ -219,19 +220,19 @@ async function getCheckinInfoSJ(host) {
             //连续签到天数
             let days = $("#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(2) > div:nth-child(2)").text();
             if (days && days.indexOf('\n') !== -1) {
-                days = days.replace(/\n/g,'');
+                days = days.replace(/\n/g, '');
             }
             // 签到奖励
             // let reward = $('#lxreward').val();
             // 签到总天数
             let allDays = $('#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(3) > div:nth-child(2)').text();
             if (allDays && allDays.indexOf('\n') !== -1) {
-                allDays = allDays.replace(/\n/g,'');
+                allDays = allDays.replace(/\n/g, '');
             }
             // 签到排名
             let rank = $('#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(1) > div:nth-child(2)').text();
             if (rank && rank.indexOf('\n') !== -1) {
-                rank = rank.replace(/\n/g,'');
+                rank = rank.replace(/\n/g, '');
             }
             let info = " 已连续签到： " + days + " ; 今日排名： " + rank + " 位； 签到总天数： " + allDays + " ；";
             host.message = host.message + info;
@@ -244,7 +245,7 @@ async function getCheckinInfoSJ(host) {
 }
 
 async function getCheckinInfo(host) {
-    let headers= host.header;
+    let headers = host.header;
     await axios
         .get(host.url, {
             headers,
@@ -348,7 +349,7 @@ async function start() {
             status = "";
             message = "";
         }
-        let sj = new HostInfo("4K视界", SJUrl,SJHeaders);
+        let sj = new HostInfo("4K视界", SJUrl, SJHeaders);
         await getFormHashSJ(sj);
         status += sj.name + ": ";
         if (sj.status) {
@@ -364,7 +365,7 @@ async function start() {
             status = "";
             message = "";
         }
-        let hao4k = new HostInfo("hao4K", hao4kUrl,headers);
+        let hao4k = new HostInfo("hao4K", hao4kUrl, headers);
         await getFormHash(hao4k);
         status += hao4k.name + ": ";
         if (hao4k.status) {
