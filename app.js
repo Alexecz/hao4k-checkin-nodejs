@@ -217,13 +217,22 @@ async function getCheckinInfoSJ(host) {
             const gb = iconv.decode(response.data, "utf-8");
             const $ = cheerio.load(gb);
             //连续签到天数
-            let days = $("#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(2) > div:nth-child(2)").text().replaceAll('\n','');
+            let days = $("#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(2) > div:nth-child(2)").text();
+            if (days && days.indexOf('\n') !== -1) {
+                days = days.replace(/\n/g,'');
+            }
             // 签到奖励
             // let reward = $('#lxreward').val();
             // 签到总天数
-            let allDays = $('#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(3) > div:nth-child(2)').text().replaceAll('\n','');
+            let allDays = $('#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(3) > div:nth-child(2)').text();
+            if (allDays && allDays.indexOf('\n') !== -1) {
+                allDays = allDays.replace(/\n/g,'');
+            }
             // 签到排名
-            let rank = $('#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(1) > div:nth-child(2)').text().replaceAll('\n','');
+            let rank = $('#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(1) > div:nth-child(2)').text();
+            if (rank && rank.indexOf('\n') !== -1) {
+                rank = rank.replace(/\n/g,'');
+            }
             let info = " 已连续签到： " + days + " ; 今日排名： " + rank + " 位； 签到总天数： " + allDays + " ；";
             host.message = host.message + info;
             console.log(host.name, info)
