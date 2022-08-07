@@ -158,10 +158,10 @@ async function checkinSJ(host) {
             if (content) {
                 if (content === "今日已签") {
                     host.message = "今日已签！";
+                } else if(content === "已签到"){
+                    host.message = "签到成功!";
                 }
-            } else {
-                host.message = "签到成功!";
-            }
+            } 
             host.status = true;
             await getCheckinInfoSJ(host);
         })
