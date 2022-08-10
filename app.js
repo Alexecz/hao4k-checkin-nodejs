@@ -33,13 +33,16 @@ let cookie = process.env["COOKIE"];
 let cookieSJ = process.env["SJCOOKIE"];
 
 
-const sjUrl =
-    "https://www.4ksj.com/qiandao/";
+const SJUrl =
+    "https://www.4ksj.com/";
 const hao4kUrl =
     "https://www.hao4k.cn/qiandao/";
 
 const userAgent =
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36 Edg/99.0.1150.39";
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36";
+
+const SJUserAgent =
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
 
 const headers = {
     cookie: cookie ?? "",
@@ -47,9 +50,9 @@ const headers = {
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
 };
 
-const SJheaders = {
+const SJHeaders = {
     cookie: cookieSJ ?? cookie,
-    "User-Agent": userAgent,
+    "User-Agent": SJUserAgent,
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
 };
 
@@ -61,15 +64,50 @@ class HostInfo {
     formHash;
     message;
 
-    constructor(name, url,header) {
+    constructor(name, url, header) {
         this.name = name;
         this.url = url;
         this.header = header;
     }
 }
 
+async function getFormHashSJ(host) {
+    let headers = host.header;
+    await axios
+        .get(host.url + 'plugin.php?id=k_misign:sign', {
+            headers,
+            responseType: "arraybuffer",
+        })
+        .then(async (response) => {
+            const gb = iconv.decode(response.data, "utf-8");
+            const $ = cheerio.load(gb);
+            let formHash = '';
+            const userName = $('#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div:nth-child(2)').text().replace('\n', '');
+            if (userName === '') {
+                console.log("cookie失效！");
+                host.status = false;
+                host.message = "cookie失效！";
+            } else {
+                console.log(host.name, "获取用户信息成功！");
+                const href = $('#plugin > div.comiis_body > div.comiis_sidenv_box > div.comiis_sidenv_top.f_f > div.sidenv_exit > a:nth-child(1)').attr('href');
+                if (href.indexOf('formhash=') !== -1) {
+                    let formHashStr = href.split('formhash=')[1];
+                    formHash = formHashStr.substring(0, formHashStr.indexOf('&'));
+                }
+                host.status = true;
+                host.formHash = formHash;
+                await checkinSJ(host);
+            }
+        })
+        .catch((error) => {
+            host.status = false;
+            host.message = "获取formhash出错" + error;
+            console.log(host.name, error);
+        });
+}
+
 async function getFormHash(host) {
-    let headers= host.header;
+    let headers = host.header;
     await axios
         .get(host.url, {
             headers,
@@ -99,10 +137,45 @@ async function getFormHash(host) {
         });
 }
 
+async function checkinSJ(host) {
+    const checkInUrl =
+        host.url + "qiandao/?mod=sign&operation=qiandao&format=text&formhash=" + host.formHash;
+    let headers = host.header;
+    await axios
+        .get(checkInUrl, {
+            headers,
+            responseType: "arraybuffer",
+        })
+        .then(async (response) => {
+            const resUtf8 = iconv.decode(response.data, "utf-8");
+            const dataStr = xmlJs.xml2json(resUtf8, {
+                compact: true,
+                spaces: 4,
+            });
+            const data = JSON.parse(dataStr);
+            const content = data?.root?._cdata;
+
+            if (content) {
+                if (content === "今日已签") {
+                    host.message = "今日已签！";
+                } else if(content === "已签到"){
+                    host.message = "签到成功!";
+                }
+            } 
+            host.status = true;
+            await getCheckinInfoSJ(host);
+        })
+        .catch((error) => {
+            console.log(host.name, "签到出错或超时" + error);
+            host.status = false;
+            host.message = "签到出错或超时" + error;
+        });
+}
+
 async function checkin(host) {
     const checkInUrl =
         host.url + "?mod=sign&operation=qiandao&formhash=" + host.formHash + "&format=empty&inajax=1&ajaxtarget=";
-        let headers= host.header;
+    let headers = host.header;
     await axios
         .get(checkInUrl, {
             headers,
@@ -118,13 +191,13 @@ async function checkin(host) {
             const content = data?.root?._cdata;
 
             if (content) {
-                host.status = true;
                 if (content === "今日已签") {
                     host.message = "今日已签！";
                 }
             } else {
                 host.message = "签到成功!";
             }
+            host.status = true;
             await getCheckinInfo(host);
         })
         .catch((error) => {
@@ -134,8 +207,45 @@ async function checkin(host) {
         });
 }
 
+async function getCheckinInfoSJ(host) {
+    let headers = host.header;
+    await axios
+        .get(host.url + 'plugin.php?id=k_misign:sign', {
+            headers,
+            responseType: "arraybuffer",
+        })
+        .then((response) => {
+            const gb = iconv.decode(response.data, "utf-8");
+            const $ = cheerio.load(gb);
+            //连续签到天数
+            let days = $("#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(2) > div:nth-child(2)").text();
+            if (days && days.indexOf('\n') !== -1) {
+                days = days.replace(/\n/g, '');
+            }
+            // 签到奖励
+            // let reward = $('#lxreward').val();
+            // 签到总天数
+            let allDays = $('#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(3) > div:nth-child(2)').text();
+            if (allDays && allDays.indexOf('\n') !== -1) {
+                allDays = allDays.replace(/\n/g, '');
+            }
+            // 签到排名
+            let rank = $('#plugin > div.comiis_body > div.comiis_bodybox > div.k_misign_header > div.info > div:nth-child(1) > div:nth-child(2)').text();
+            if (rank && rank.indexOf('\n') !== -1) {
+                rank = rank.replace(/\n/g, '');
+            }
+            let info = " 已连续签到： " + days + " ; 今日排名： " + rank + " 位； 签到总天数： " + allDays + " ；";
+            host.message = host.message + info;
+            console.log(host.name, info)
+        })
+        .catch((error) => {
+            host.message = "获取签到信息出错！" + error;
+            console.log(host.name, "获取签到信息出错！" + error);
+        });
+}
+
 async function getCheckinInfo(host) {
-    let headers= host.header;
+    let headers = host.header;
     await axios
         .get(host.url, {
             headers,
@@ -233,14 +343,14 @@ async function start() {
     let checkIn = false;
     console.log("配置的打卡的服务", needCheckHost);
     const needCheck = needCheckHost ? needCheckHost : "hao4k";
-    if (needCheck.indexOf("4ksj") > -1) {
+    if (needCheck.indexOf("4ksj") !== -1) {
         if (!checkIn) {
             checkIn = true;
             status = "";
             message = "";
         }
-        let sj = new HostInfo("4K视界", sjUrl,SJheaders);
-        await getFormHash(sj);
+        let sj = new HostInfo("4K视界", SJUrl, SJHeaders);
+        await getFormHashSJ(sj);
         status += sj.name + ": ";
         if (sj.status) {
             status += "签到成功！";
@@ -249,13 +359,13 @@ async function start() {
         }
         message += "* " + sj.name + ": " + sj.message;
     }
-    if (needCheck.indexOf("hao4k") > -1) {
+    if (needCheck.indexOf("hao4k") !== -1) {
         if (!checkIn) {
             checkIn = true;
             status = "";
             message = "";
         }
-        let hao4k = new HostInfo("hao4K", hao4kUrl,headers);
+        let hao4k = new HostInfo("hao4K", hao4kUrl, headers);
         await getFormHash(hao4k);
         status += hao4k.name + ": ";
         if (hao4k.status) {
