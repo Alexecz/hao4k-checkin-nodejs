@@ -23,7 +23,8 @@ const barkKey = process.env["BARKKEY"]
 const barkServer = process.env["BARKSERVER"]
 
 //配置需要打开的服务信息,hao4k 和 4ksj，未配置只对hao4k
-const needCheckHost = process.env["CHECKHOST"]
+// const needCheckHost = process.env["CHECKHOST"]
+const needCheckHost = '4ksj'
 
 // 填入Hao4k账号对应cookie
 let cookie = process.env["COOKIE"];
@@ -42,7 +43,7 @@ const userAgent =
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36";
 
 const SJUserAgent =
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0";
 
 const headers = {
     cookie: cookie ?? "",
@@ -74,7 +75,7 @@ class HostInfo {
 async function getFormHashSJ(host) {
     let headers = host.header;
     await axios
-        .get(host.url + 'plugin.php?id=k_misign:sign', {
+        .get(host.url + 'qiandao.php', {
             headers,
             responseType: "arraybuffer",
         })
@@ -82,18 +83,15 @@ async function getFormHashSJ(host) {
             const gb = iconv.decode(response.data, "utf-8");
             const $ = cheerio.load(gb);
             let formHash = '';
-            const userName = $('h2.fyy').text().replace('\n', '');
+            const userName = $('.nexmemberintels>h5').text().replace('\n', '');
+            
             if (userName === '') {
                 console.log("cookie失效！");
                 host.status = false;
                 host.message = "cookie失效！";
             } else {
                 console.log(host.name, "获取用户信息成功！");
-                const href = $('#plugin > div.comiis_body > div.comiis_sidenv_box > div.comiis_sidenv_top.f_f > div.sidenv_exit > a:nth-child(1)').attr('href');
-                if (href.indexOf('formhash=') !== -1) {
-                    let formHashStr = href.split('formhash=')[1];
-                    formHash = formHashStr.substring(0, formHashStr.indexOf('&'));
-                }
+                formHash = $('#scbar_form input:nth-child(2)').val();
                 host.status = true;
                 host.formHash = formHash;
                 await checkinSJ(host);
@@ -139,7 +137,7 @@ async function getFormHash(host) {
 
 async function checkinSJ(host) {
     const checkInUrl =
-        host.url + "qiandao/?mod=sign&operation=qiandao&format=text&formhash=" + host.formHash;
+        host.url + "qiandao.php?sign=" + host.formHash;
     let headers = host.header;
     await axios
         .get(checkInUrl, {
@@ -147,21 +145,11 @@ async function checkinSJ(host) {
             responseType: "arraybuffer",
         })
         .then(async (response) => {
-            const resUtf8 = iconv.decode(response.data, "utf-8");
-            const dataStr = xmlJs.xml2json(resUtf8, {
-                compact: true,
-                spaces: 4,
-            });
-            const data = JSON.parse(dataStr);
-            const content = data?.root?._cdata;
+            const GBK = iconv.decode(response.data, "GBK");
+            const $ = cheerio.load(GBK);
+            const msg = $('#messagetext>p').text()
 
-            if (content) {
-                if (content === "今日已签") {
-                    host.message = "今日已签！";
-                } else if(content === "已签到"){
-                    host.message = "签到成功!";
-                }
-            } 
+            host.message = msg;
             host.status = true;
             await getCheckinInfoSJ(host);
         })
@@ -210,33 +198,27 @@ async function checkin(host) {
 async function getCheckinInfoSJ(host) {
     let headers = host.header;
     await axios
-        .get(host.url + 'plugin.php?id=k_misign:sign', {
+        .get(host.url + 'qiandao.php', {
             headers,
             responseType: "arraybuffer",
         })
         .then((response) => {
-            const gb = iconv.decode(response.data, "utf-8");
+            const gb = iconv.decode(response.data, "GBK");
             const $ = cheerio.load(gb);
-            //连续签到天数
-            let days = $(".comiis_qdinfo > ul > li:nth-child(2)").text();
-            if (days && days.indexOf('\n') !== -1) {
-                days = days.replace(/\n/g, '');
-            }
-            // 签到奖励
-            // let reward = $('#lxreward').val();
-            // 签到总天数
-            let allDays = $(".comiis_qdinfo > ul > li:nth-child(3)").text()
-            if (allDays && allDays.indexOf('\n') !== -1) {
-                allDays = allDays.replace(/\n/g, '');
-            }
-            // 签到排名
-            let rank = $(".comiis_qdinfo > ul > li:nth-child(1)").text();
-            if (rank && rank.indexOf('\n') !== -1) {
-                rank = rank.replace(/\n/g, '');
-            }
-            let info = " 已连续签到： " + days + " ; 今日排名： " + rank + " 位； 签到总天数： " + allDays + " ；";
+            //本月打卡
+            let month = $('#wp > .ct2 > .sd div:nth-child(2) .xl1 li:nth-child(2):eq(0)').text(); 
+            //连续打卡
+            let ctu = $('#wp > .ct2 > .sd div:nth-child(2) .xl1 li:nth-child(3):eq(0)').text();
+            //累计打卡
+            let total = $('#wp > .ct2 > .sd div:nth-child(2) .xl1 li:nth-child(4):eq(0)').text();
+            //累计奖励
+            let totalPrice = $('#wp > .ct2 > .sd div:nth-child(2) .xl1 li:nth-child(5):eq(0)').text();
+            //最近奖励
+            let price = $('#wp > .ct2 > .sd div:nth-child(2) .xl1 li:nth-child(6):eq(0)').text();
+          
+            let info = month +'; '+ ctu +'; '+ total +'; '+ totalPrice +'; '+ price;
             host.message = host.message + info;
-            console.log(host.name, info)
+            // console.log(host.name, info)
         })
         .catch((error) => {
             host.message = "获取签到信息出错！" + error;
