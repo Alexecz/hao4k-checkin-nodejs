@@ -26,7 +26,7 @@ jobs:
     - name: 安装node
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '20'
  
     - name: 安装依赖包
       run: npm install
