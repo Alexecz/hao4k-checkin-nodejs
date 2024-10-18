@@ -25,7 +25,7 @@
 
 ### 建议提取 cookie 用该浏览器插件复制  把**cookie列表**先勾上 > 然后点击**cookie列表** > 直接点**copy all**  （自己复制的cookie会有问题！）
 
-https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmiomfpdnehakfmpfl/related?hl=zh-CN
+https://chromewebstore.google.com/detail/header-cookie-qrcode-case/echlhpliefhchnkmiomfpdnehakfmpfl
 
 3. 在自己的仓库“Settings”里根据需要创建**“Secrets => Actions => New repository secret”**， （不开启通知，只需要创建一个SJCOOKIE即可）
 
