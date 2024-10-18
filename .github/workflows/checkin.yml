@@ -21,10 +21,10 @@ jobs:
     
     steps:
     # check-out 仓库中最新的代码到 Workflow 的工作区
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: 安装node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: '20'
  
