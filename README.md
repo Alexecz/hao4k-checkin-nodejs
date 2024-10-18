@@ -2,7 +2,6 @@
 
 2024/10/18 修复4ksj签到，弃用hao4k签到
 
-TODO : 修复推送
 
 ### 建议提取 cookie 用该浏览器插件复制  把cookie列表先勾上 然后点击cookie列表 直接点copy all  （自己复制cookie会有问题！）
 https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmiomfpdnehakfmpfl/related?hl=zh-CN
@@ -16,14 +15,14 @@ https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmi
 
 3、可以通过“推送加” （[http://www.pushplus.plus](http://www.pushplus.plus))，自动发通知到微信上。
 
-4、可以通过“PushDeer” （[http://www.pushdeer.com](http://www.pushdeer.com))，自动推送到**手机通知**上。 请使用**官方在线版**。 
+4、可以通过“PushDeer” （[http://www.pushdeer.com](http://www.pushdeer.com))，自动推送到手机上。 请使用**官方在线版**。 
 
-5、可以通过“Server酱”（[http://sc.ftqq.com/3.version](http://sc.ftqq.com/3.version))，自动发通知到微信上。
+5、可以通过“Server酱”（[https://sct.ftqq.com/](https://sct.ftqq.com/))，自动发通知到微信上。
 
 6、可以通过“bark”（[https://github.com/Finb/Bark](https://github.com/Finb/Bark))，自动发通知到ios上。
 
 
-#### 食用姿势：
+#### 使用教程：
 
 1. 先“Fork”本仓库。（不需要修改任何文件！）
 
@@ -41,6 +40,6 @@ https://chrome.google.com/webstore/detail/header-cookie-qrcode/echlhpliefhchnkmi
    - BARKKEY (填写bark的key，不开启bark推送则不用填，默认使用官方服务器发送，如需自定义请通过BARKSERVER配置)
    - BARKSERVER (填写bark的服务器地址，不开启bark推送则不用填)
 
-5. 以上设置完毕后，每天0点和6点会自动触发，并会执行自动签到（**0点4ksj经常抽风**，故多增加一次执行,可自行改时间）。
+5. 以上设置完毕后，每天0点和6点会自动触发，并会执行自动签到（**0点GitHub网络经常抽风**，故多增加一次执行,可自行改时间）。
 
 
